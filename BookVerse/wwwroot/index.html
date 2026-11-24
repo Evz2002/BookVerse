@@ -1,0 +1,710 @@
+﻿<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بوک‌ورس | فروشگاه آنلاین کتاب</title>
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+    <style>
+        body {
+            font-family: 'Vazirmatn', system-ui, -apple-system, sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+        }
+
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.78);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .book-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        }
+
+            .book-card:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.45);
+                border-color: rgba(99, 102, 241, 0.45);
+            }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-30 glass-panel border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center font-black text-xl text-white shadow-lg shadow-indigo-500/25">
+                    B
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg text-white">بوک‌ورس</h1>
+                    <p class="text-xs text-slate-400 hidden sm:block">فروشگاه تخصصی کتاب‌های برنامه‌نویسی و تکنولوژی</p>
+                </div>
+            </div>
+
+            <nav class="flex items-center gap-1 sm:gap-2 bg-slate-900/80 p-1 rounded-xl border border-slate-800">
+                <button data-tab="store" class="nav-tab px-3 py-1.5 rounded-lg text-sm font-medium bg-indigo-600 text-white transition">ویترین کتاب‌ها</button>
+                <button data-tab="orders" class="nav-tab px-3 py-1.5 rounded-lg text-sm font-medium text-slate-300 hover:text-white transition">سفارش‌های من</button>
+                <button data-tab="admin" class="nav-tab px-3 py-1.5 rounded-lg text-sm font-medium text-slate-300 hover:text-white transition">پنل مدیریت</button>
+            </nav>
+
+            <div class="flex items-center gap-2 sm:gap-3">
+                <div id="userStatusArea" class="flex items-center gap-2">
+                    <button id="btnOpenAuth" class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white transition">
+                        ورود / ثبت‌نام
+                    </button>
+                </div>
+
+                <button id="btnOpenCart" class="relative px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 transition flex items-center gap-2">
+                    <span class="text-xs font-bold hidden sm:inline">سبد خرید</span>
+                    <span id="cartBadge" class="px-2 py-0.5 text-xs font-bold rounded-full bg-indigo-500 text-white">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <!-- TAB 1: STOREFRONT -->
+        <section id="tab-store" class="space-y-6">
+            <div class="glass-panel rounded-2xl p-6 border border-indigo-500/20 space-y-5">
+                <div class="flex flex-wrap items-center justify-between gap-4">
+                    <div>
+                        <h2 class="text-2xl font-black text-white">ویترین کتاب‌های بوک‌ورس</h2>
+                        <p class="text-xs text-slate-400 mt-1">مجموعه‌ای گزیده از بهترین کتاب‌های مهندسی نرم‌افزار و برنامه‌نویسی</p>
+                    </div>
+                    <button id="btnRefreshBooks" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs text-indigo-300 transition">
+                        بروزرسانی لیست
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                    <input id="searchInput" type="text" dir="rtl" placeholder="جستجوی عنوان کتاب، نویسنده یا شابک..." class="sm:col-span-2 bg-slate-900 border border-slate-700 focus:border-indigo-500 rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-400 focus:outline-none">
+                    <select id="categoryFilter" class="bg-slate-900 border border-slate-700 focus:border-indigo-500 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none">
+                        <option value="ALL">همه دسته‌بندی‌ها</option>
+                        <option value="Architecture">معماری نرم‌افزار</option>
+                        <option value="DotNet">دات‌نت و سی‌شارپ</option>
+                        <option value="Testing">تست و کیفیت کد</option>
+                        <option value="Database">پایگاه داده</option>
+                    </select>
+                    <select id="sortFilter" class="bg-slate-900 border border-slate-700 focus:border-indigo-500 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none">
+                        <option value="popular">جدیدترین‌ها</option>
+                        <option value="price-asc">ارزان‌ترین</option>
+                        <option value="price-desc">گران‌ترین</option>
+                        <option value="rating">بالاترین امتیاز</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="booksGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"></div>
+        </section>
+
+        <!-- TAB 2: MY ORDERS -->
+        <section id="tab-orders" class="hidden space-y-6">
+            <div class="glass-panel rounded-2xl p-6 border border-slate-800 space-y-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-xl font-bold text-white">سفارش‌های من</h2>
+                        <p class="text-xs text-slate-400 mt-1">تاریخچه خریدها و وضعیت پردازش سفارش‌های شما</p>
+                    </div>
+                    <button id="btnRefreshOrders" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs text-indigo-300 border border-slate-700 transition">بروزرسانی</button>
+                </div>
+                <div id="ordersList" class="space-y-4"></div>
+            </div>
+        </section>
+
+        <!-- TAB 3: ADMIN PANEL -->
+        <section id="tab-admin" class="hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="glass-panel rounded-2xl p-6 border border-slate-800 space-y-4">
+                    <div>
+                        <h3 class="font-bold text-white text-base">افزودن کتاب جدید</h3>
+                        <p class="text-xs text-slate-400 mt-1">مختص مدیران فروشگاه</p>
+                    </div>
+                    <form id="createBookForm" class="space-y-3.5">
+                        <div class="space-y-1">
+                            <label for="inpTitle" class="block text-xs text-slate-300">عنوان کتاب</label>
+                            <input id="inpTitle" type="text" dir="rtl" placeholder="مثال: معماری تمیز یا Clean Code" required class="w-full bg-slate-900 border border-slate-700 focus:border-indigo-500 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none">
+                        </div>
+                        <div class="space-y-1">
+                            <label for="inpAuthor" class="block text-xs text-slate-300">نام نویسنده</label>
+                            <input id="inpAuthor" type="text" dir="rtl" placeholder="نام نویسنده کتاب" required class="w-full bg-slate-900 border border-slate-700 focus:border-indigo-500 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none">
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="space-y-1">
+                                <label for="inpIsbn" class="block text-xs text-slate-300">شابک (۱۳ رقم)</label>
+                                <input id="inpIsbn" type="text" dir="ltr" placeholder="9780134494166" required class="w-full bg-slate-900 border border-slate-700 focus:border-indigo-500 rounded-xl px-3 py-2 text-sm text-white text-left font-mono focus:outline-none">
+                            </div>
+                            <div class="space-y-1">
+                                <label for="inpCategory" class="block text-xs text-slate-300">دسته‌بندی</label>
+                                <select id="inpCategory" class="w-full bg-slate-900 border border-slate-700 focus:border-indigo-500 rounded-xl px-3 py-2 text-sm text-white focus:outline-none">
+                                    <option value="Architecture">معماری نرم‌افزار</option>
+                                    <option value="DotNet">دات‌نت و سی‌شارپ</option>
+                                    <option value="Testing">تست و کیفیت کد</option>
+                                    <option value="Database">پایگاه داده</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="space-y-1">
+                                <label for="inpPrice" class="block text-xs text-slate-300">قیمت (تومان)</label>
+                                <input id="inpPrice" type="number" dir="ltr" placeholder="680000" required class="w-full bg-slate-900 border border-slate-700 focus:border-indigo-500 rounded-xl px-3 py-2 text-sm text-white text-left font-mono focus:outline-none">
+                            </div>
+                            <div class="space-y-1">
+                                <label for="inpStock" class="block text-xs text-slate-300">موجودی انبار</label>
+                                <input id="inpStock" type="number" dir="ltr" placeholder="10" required class="w-full bg-slate-900 border border-slate-700 focus:border-indigo-500 rounded-xl px-3 py-2 text-sm text-white text-left font-mono focus:outline-none">
+                            </div>
+                        </div>
+                        <button type="submit" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm transition">
+                            ثبت کتاب
+                        </button>
+                    </form>
+                </div>
+
+                <div class="lg:col-span-2 glass-panel rounded-2xl p-6 border border-slate-800 space-y-4">
+                    <div>
+                        <h3 class="font-bold text-white text-base">مدیریت موجودی کتاب‌ها</h3>
+                        <p class="text-xs text-slate-400 mt-1">افزایش یا کاهش سریع موجودی انبار</p>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-right text-sm">
+                            <thead>
+                                <tr class="border-b border-slate-800 text-slate-400 text-xs">
+                                    <th class="pb-3 font-medium">عنوان کتاب</th>
+                                    <th class="pb-3 font-medium">شابک</th>
+                                    <th class="pb-3 font-medium">قیمت</th>
+                                    <th class="pb-3 font-medium">موجودی</th>
+                                    <th class="pb-3 font-medium">تنظیم موجودی</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminInventoryTable" class="divide-y divide-slate-800/60"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Auth Modal -->
+    <div id="authModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+        <div id="authBackdrop" class="absolute inset-0 bg-black/75 backdrop-blur-sm"></div>
+        <div class="relative z-10 w-full max-w-md glass-panel rounded-2xl p-6 border border-slate-700 space-y-5">
+            <div class="flex items-center justify-between">
+                <h3 class="font-bold text-white text-lg">حساب کاربری</h3>
+                <button id="btnCloseAuth" class="text-slate-400 hover:text-white px-2 py-1">✕</button>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 bg-slate-900 p-1 rounded-xl">
+                <button id="tabLoginBtn" class="py-2 rounded-lg text-xs font-bold bg-indigo-600 text-white transition">ورود</button>
+                <button id="tabRegisterBtn" class="py-2 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition">ثبت‌نام</button>
+            </div>
+
+            <form id="loginForm" class="space-y-3.5">
+                <div class="space-y-1">
+                    <label for="loginEmail" class="block text-xs text-slate-300">ایمیل</label>
+                    <input id="loginEmail" type="email" dir="ltr" placeholder="name@example.com" required class="w-full bg-slate-900 border border-slate-700 focus:border-indigo-500 rounded-xl px-3.5 py-2 text-sm text-white text-left focus:outline-none">
+                </div>
+                <div class="space-y-1">
+                    <label for="loginPassword" class="block text-xs text-slate-300">رمز عبور</label>
+                    <input id="loginPassword" type="password" dir="ltr" placeholder="••••••••" required class="w-full bg-slate-900 border border-slate-700 focus:border-indigo-500 rounded-xl px-3.5 py-2 text-sm text-white text-left focus:outline-none">
+                </div>
+                <button type="submit" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm transition">ورود به حساب</button>
+            </form>
+
+            <form id="registerForm" class="hidden space-y-3.5">
+                <div class="space-y-1">
+                    <label for="regFullName" class="block text-xs text-slate-300">نام و نام خانوادگی</label>
+                    <input id="regFullName" type="text" dir="rtl" placeholder="نام کامل خود را وارد کنید" required class="w-full bg-slate-900 border border-slate-700 focus:border-indigo-500 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none">
+                </div>
+                <div class="space-y-1">
+                    <label for="regEmail" class="block text-xs text-slate-300">ایمیل</label>
+                    <input id="regEmail" type="email" dir="ltr" placeholder="name@example.com" required class="w-full bg-slate-900 border border-slate-700 focus:border-indigo-500 rounded-xl px-3.5 py-2 text-sm text-white text-left focus:outline-none">
+                </div>
+                <div class="space-y-1">
+                    <label for="regPassword" class="block text-xs text-slate-300">رمز عبور (حداقل ۶ کاراکتر)</label>
+                    <input id="regPassword" type="password" dir="ltr" placeholder="••••••••" required class="w-full bg-slate-900 border border-slate-700 focus:border-indigo-500 rounded-xl px-3.5 py-2 text-sm text-white text-left focus:outline-none">
+                </div>
+                <div class="space-y-1">
+                    <label for="regRole" class="block text-xs text-slate-300">نوع حساب</label>
+                    <select id="regRole" class="w-full bg-slate-900 border border-slate-700 focus:border-indigo-500 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none">
+                        <option value="Customer">مشتری</option>
+                        <option value="Admin">مدیر فروشگاه</option>
+                    </select>
+                </div>
+                <button type="submit" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm transition">ایجاد حساب کاربری</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Shopping Cart Slide-Over -->
+    <div id="cartModal" class="fixed inset-0 z-50 hidden">
+        <div id="cartBackdrop" class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
+        <div class="absolute inset-y-0 left-0 max-w-md w-full bg-slate-900 border-r border-slate-800 shadow-2xl flex flex-col">
+            <div class="p-5 border-b border-slate-800 flex items-center justify-between">
+                <h3 class="font-bold text-white text-lg">سبد خرید</h3>
+                <button id="btnCloseCart" class="p-2 rounded-lg bg-slate-800 text-slate-400 hover:text-white">✕</button>
+            </div>
+
+            <div id="cartItemsContainer" class="flex-1 overflow-y-auto p-5 space-y-3"></div>
+
+            <div class="p-5 border-t border-slate-800 bg-slate-950 space-y-4">
+                <div class="space-y-1.5">
+                    <label for="couponInput" class="block text-xs text-slate-300">کد تخفیف (اختیاری)</label>
+                    <input id="couponInput" type="text" dir="ltr" placeholder="CLEAN20" class="w-full bg-slate-900 border border-slate-700 focus:border-indigo-500 rounded-xl px-3.5 py-2 text-sm text-white text-left font-mono uppercase focus:outline-none">
+                </div>
+
+                <div class="space-y-1.5">
+                    <label for="shippingAddressInput" class="block text-xs text-slate-300">آدرس تحویل سفارش</label>
+                    <input id="shippingAddressInput" type="text" dir="rtl" value="تهران، خیابان ولیعصر، پلاک ۱۲۴، واحد ۴" placeholder="آدرس کامل خود را وارد کنید" class="w-full bg-slate-900 border border-slate-700 focus:border-indigo-500 rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none">
+                </div>
+
+                <div class="flex items-center justify-between text-white font-bold text-base pt-2 border-t border-slate-800">
+                    <span>جمع سبد خرید:</span>
+                    <span id="cartTotal" class="text-indigo-300">۰ تومان</span>
+                </div>
+
+                <button id="btnCheckout" class="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold text-sm shadow-lg shadow-indigo-600/25 transition">
+                    ثبت نهایی سفارش
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="fixed bottom-5 left-5 z-50 space-y-2 max-w-sm w-full pointer-events-none"></div>
+
+    <script>
+        const API_BASE = window.location.protocol === 'file:' ? 'https://localhost:7129/api/v1' : '/api/v1';
+
+        const categoryLabels = {
+            Architecture: 'معماری نرم‌افزار',
+            DotNet: 'دات‌نت و سی‌شارپ',
+            Testing: 'تست و کیفیت کد',
+            Database: 'پایگاه داده'
+        };
+
+        const statusLabels = {
+            Pending: 'در انتظار پردازش',
+            Paid: 'پرداخت شده',
+            Shipped: 'ارسال شده',
+            Cancelled: 'لغو شده'
+        };
+
+        const state = {
+            token: localStorage.getItem('bv_token') || '',
+            user: JSON.parse(localStorage.getItem('bv_user') || 'null'),
+            books: [],
+            cart: [],
+            orders: []
+        };
+
+        function formatPrice(n) {
+            return Number(n || 0).toLocaleString('fa-IR') + ' تومان';
+        }
+
+        function showToast(title, message, type = 'info') {
+            const box = document.getElementById('toastContainer');
+            const styles = {
+                success: 'border-emerald-500/50 bg-slate-900 text-emerald-300',
+                error: 'border-rose-500/50 bg-slate-900 text-rose-300',
+                warning: 'border-amber-500/50 bg-slate-900 text-amber-300',
+                info: 'border-indigo-500/50 bg-slate-900 text-indigo-300'
+            };
+            const el = document.createElement('div');
+            el.className = `pointer-events-auto p-4 rounded-xl border shadow-xl ${styles[type] || styles.info}`;
+            el.innerHTML = `<div class="font-bold text-sm">${title}</div><div class="text-xs text-slate-300 mt-1">${message}</div>`;
+            box.appendChild(el);
+            setTimeout(() => el.remove(), 4500);
+        }
+
+        async function parseApiError(res) {
+            try {
+                const err = await res.json();
+                if (err.errors) {
+                    return Object.values(err.errors).flat().join(' | ');
+                }
+                return err.title || err.detail || 'عملیات با خطا مواجه شد.';
+            } catch {
+                if (res.status === 401) return 'ابتدا وارد حساب کاربری خود شوید.';
+                if (res.status === 403) return 'دسترسی شما برای انجام این عملیات کافی نیست.';
+                return 'خطا در برقراری ارتباط با سرور.';
+            }
+        }
+
+        function updateAuthUI() {
+            const area = document.getElementById('userStatusArea');
+            if (state.user && state.token) {
+                const roleLabel = state.user.role === 'Admin' ? 'مدیر' : 'مشتری';
+                area.innerHTML = `
+                        <div class="hidden md:flex items-center gap-2 bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-700 text-xs">
+                            <span class="text-white font-bold">${state.user.fullName}</span>
+                            <span class="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300">${roleLabel}</span>
+                        </div>
+                        <button id="btnLogout" class="px-3 py-2 rounded-xl bg-rose-600/20 hover:bg-rose-600/40 border border-rose-500/30 text-rose-300 text-xs font-bold transition">خروج</button>
+                    `;
+                document.getElementById('btnLogout').addEventListener('click', () => {
+                    state.token = '';
+                    state.user = null;
+                    localStorage.removeItem('bv_token');
+                    localStorage.removeItem('bv_user');
+                    updateAuthUI();
+                    showToast('خروج از حساب', 'با موفقیت از حساب کاربری خارج شدید.', 'info');
+                });
+            } else {
+                area.innerHTML = `<button id="btnOpenAuth" class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white transition">ورود / ثبت‌نام</button>`;
+                document.getElementById('btnOpenAuth').addEventListener('click', () => {
+                    document.getElementById('authModal').classList.remove('hidden');
+                });
+            }
+        }
+
+        async function loadBooks() {
+            const search = document.getElementById('searchInput').value.trim();
+            const category = document.getElementById('categoryFilter').value;
+            const sortBy = document.getElementById('sortFilter').value;
+
+            const params = new URLSearchParams({ pageNumber: '1', pageSize: '12', sortBy });
+            if (search) params.append('searchTerm', search);
+            if (category !== 'ALL') params.append('category', category);
+
+            try {
+                const res = await fetch(`${API_BASE}/books?${params}`);
+                if (!res.ok) throw new Error(await parseApiError(res));
+                const data = await res.json();
+                state.books = data.items || [];
+                renderBooks();
+                renderAdminTable();
+            } catch (e) {
+                showToast('خطا در بارگذاری کتاب‌ها', e.message, 'error');
+            }
+        }
+
+        function renderBooks() {
+            const grid = document.getElementById('booksGrid');
+            if (state.books.length === 0) {
+                grid.innerHTML = `<div class="col-span-full glass-panel rounded-2xl p-10 text-center text-slate-400 text-sm">هنوز کتابی ثبت نشده است.</div>`;
+                return;
+            }
+            grid.innerHTML = state.books.map(book => `
+                    <div class="book-card glass-panel rounded-2xl overflow-hidden flex flex-col justify-between border border-slate-800">
+                        <div>
+                            <div class="h-28 bg-gradient-to-br from-indigo-600 to-violet-800 p-4 flex flex-col justify-between">
+                                <div class="flex justify-between items-center">
+                                    <span class="px-2.5 py-0.5 rounded-lg bg-black/35 text-white text-xs">${categoryLabels[book.category] || book.category}</span>
+                                    <span class="text-xs text-white font-mono">★ ${book.rating}</span>
+                                </div>
+                                <div class="text-left font-mono text-[11px] text-white/80" dir="ltr">ISBN: ${book.isbn}</div>
+                            </div>
+                            <div class="p-4 space-y-1.5">
+                                <h3 class="font-bold text-white text-base leading-snug">${book.title}</h3>
+                                <p class="text-xs text-slate-400">${book.author}</p>
+                            </div>
+                        </div>
+                        <div class="p-4 pt-3 border-t border-slate-800 space-y-3 bg-slate-900/40">
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="${book.stockQuantity > 0 ? 'text-emerald-400' : 'text-rose-400'}">موجودی: ${book.stockQuantity} عدد</span>
+                                <span class="font-bold text-white text-sm">${formatPrice(book.price)}</span>
+                            </div>
+                            <button data-add-cart="${book.id}" ${book.stockQuantity <= 0 ? 'disabled' : ''} class="w-full py-2 rounded-xl text-xs font-bold transition ${book.stockQuantity <= 0 ? 'bg-slate-800 text-slate-500 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500 text-white'}">
+                                ${book.stockQuantity <= 0 ? 'ناموجود' : 'افزودن به سبد خرید'}
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+        }
+
+        function renderAdminTable() {
+            const tbody = document.getElementById('adminInventoryTable');
+            if (state.books.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-400 text-xs">کتابی برای نمایش وجود ندارد.</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = state.books.map(book => `
+                    <tr class="hover:bg-slate-900/40">
+                        <td class="py-3 text-white font-medium">${book.title}</td>
+                        <td class="py-3 font-mono text-xs text-slate-400 text-right" dir="ltr">${book.isbn}</td>
+                        <td class="py-3 text-xs text-slate-300">${formatPrice(book.price)}</td>
+                        <td class="py-3 font-mono text-xs text-emerald-300">${book.stockQuantity}</td>
+                        <td class="py-3">
+                            <div class="flex gap-2">
+                                <button data-stock="${book.id}" data-delta="5" class="px-2.5 py-1 rounded-lg bg-emerald-600/25 hover:bg-emerald-600/45 text-emerald-200 border border-emerald-500/30 text-xs transition">+۵ شارژ</button>
+                                <button data-stock="${book.id}" data-delta="-5" class="px-2.5 py-1 rounded-lg bg-amber-600/25 hover:bg-amber-600/45 text-amber-200 border border-amber-500/30 text-xs transition">-۵ کسر</button>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+        }
+
+        function renderCart() {
+            const badge = document.getElementById('cartBadge');
+            const container = document.getElementById('cartItemsContainer');
+            badge.textContent = String(state.cart.reduce((s, i) => s + i.quantity, 0));
+
+            if (state.cart.length === 0) {
+                container.innerHTML = `<div class="text-center py-10 text-slate-400 text-sm">سبد خرید شما خالی است.</div>`;
+                document.getElementById('cartTotal').textContent = '۰ تومان';
+                return;
+            }
+
+            let total = 0;
+            container.innerHTML = state.cart.map(item => {
+                const book = state.books.find(b => b.id === item.bookId);
+                if (!book) return '';
+                total += book.price * item.quantity;
+                return `
+                        <div class="p-3.5 rounded-xl bg-slate-800/80 border border-slate-700 flex justify-between items-center gap-3">
+                            <div>
+                                <div class="text-xs font-bold text-white">${book.title}</div>
+                                <div class="text-xs text-slate-400 mt-1">${formatPrice(book.price)} × ${item.quantity}</div>
+                            </div>
+                            <button data-remove-cart="${book.id}" class="text-xs text-rose-400 hover:text-rose-300">حذف</button>
+                        </div>
+                    `;
+            }).join('');
+            document.getElementById('cartTotal').textContent = formatPrice(total);
+        }
+
+        async function loadOrders() {
+            const list = document.getElementById('ordersList');
+            if (!state.token || !state.user) {
+                list.innerHTML = `<div class="text-slate-400 text-sm">برای مشاهده سفارش‌های خود ابتدا وارد حساب کاربری شوید.</div>`;
+                return;
+            }
+            try {
+                const res = await fetch(`${API_BASE}/orders/customer/${state.user.userId}`, {
+                    headers: { 'Authorization': `Bearer ${state.token}` }
+                });
+                if (!res.ok) throw new Error(await parseApiError(res));
+                state.orders = await res.json();
+                if (state.orders.length === 0) {
+                    list.innerHTML = `<div class="text-slate-400 text-sm">هنوز سفارشی ثبت نکرده‌اید.</div>`;
+                    return;
+                }
+                list.innerHTML = state.orders.map(o => `
+                        <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2.5">
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="text-slate-400">کد سفارش: <span class="font-mono text-indigo-400">${o.orderId.slice(0, 8).toUpperCase()}</span></span>
+                                <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300">${statusLabels[o.status] || o.status}</span>
+                            </div>
+                            <div class="text-xs text-slate-400">آدرس تحویل: ${o.shippingAddress}</div>
+                            <div class="space-y-1.5">
+                                ${(o.items || []).map(it => `<div class="flex justify-between text-xs bg-slate-950 px-3 py-2 rounded-lg"><span class="text-slate-200">${it.bookTitle} (${it.quantity} عدد)</span><span class="text-slate-300">${formatPrice(it.totalLinePrice)}</span></div>`).join('')}
+                            </div>
+                            <div class="flex justify-between text-sm font-bold text-white pt-2 border-t border-slate-800">
+                                <span>مبلغ نهایی ${o.discountAmount > 0 ? `(تخفیف: ${formatPrice(o.discountAmount)})` : ''}:</span>
+                                <span class="text-emerald-400">${formatPrice(o.totalAmount)}</span>
+                            </div>
+                        </div>
+                    `).join('');
+            } catch (e) {
+                showToast('خطا در دریافت سفارش‌ها', e.message, 'error');
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            updateAuthUI();
+            loadBooks();
+
+            document.querySelectorAll('.nav-tab').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const tab = btn.getAttribute('data-tab');
+                    document.querySelectorAll('.nav-tab').forEach(b => {
+                        b.classList.remove('bg-indigo-600', 'text-white');
+                        b.classList.add('text-slate-300');
+                    });
+                    btn.classList.add('bg-indigo-600', 'text-white');
+                    btn.classList.remove('text-slate-300');
+                    ['store', 'orders', 'admin'].forEach(t => {
+                        document.getElementById('tab-' + t).classList.toggle('hidden', t !== tab);
+                    });
+                    if (tab === 'orders') loadOrders();
+                });
+            });
+
+            ['searchInput', 'categoryFilter', 'sortFilter'].forEach(id => {
+                document.getElementById(id).addEventListener('input', loadBooks);
+            });
+            document.getElementById('btnRefreshBooks').addEventListener('click', loadBooks);
+            document.getElementById('btnRefreshOrders').addEventListener('click', loadOrders);
+
+            document.getElementById('btnCloseAuth').addEventListener('click', () => document.getElementById('authModal').classList.add('hidden'));
+            document.getElementById('authBackdrop').addEventListener('click', () => document.getElementById('authModal').classList.add('hidden'));
+            document.getElementById('tabLoginBtn').addEventListener('click', () => {
+                document.getElementById('loginForm').classList.remove('hidden');
+                document.getElementById('registerForm').classList.add('hidden');
+                document.getElementById('tabLoginBtn').classList.add('bg-indigo-600', 'text-white');
+                document.getElementById('tabRegisterBtn').classList.remove('bg-indigo-600', 'text-white');
+            });
+            document.getElementById('tabRegisterBtn').addEventListener('click', () => {
+                document.getElementById('registerForm').classList.remove('hidden');
+                document.getElementById('loginForm').classList.add('hidden');
+                document.getElementById('tabRegisterBtn').classList.add('bg-indigo-600', 'text-white');
+                document.getElementById('tabLoginBtn').classList.remove('bg-indigo-600', 'text-white');
+            });
+
+            document.getElementById('loginForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                try {
+                    const res = await fetch(`${API_BASE}/auth/login`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            email: document.getElementById('loginEmail').value,
+                            password: document.getElementById('loginPassword').value
+                        })
+                    });
+                    if (!res.ok) throw new Error(await parseApiError(res));
+                    const data = await res.json();
+                    state.token = data.accessToken;
+                    state.user = data;
+                    localStorage.setItem('bv_token', data.accessToken);
+                    localStorage.setItem('bv_user', JSON.stringify(data));
+                    updateAuthUI();
+                    document.getElementById('authModal').classList.add('hidden');
+                    showToast('خوش آمدید', `${data.fullName} عزیز، با موفقیت وارد شدید.`, 'success');
+                } catch (err) {
+                    showToast('خطای ورود', err.message, 'error');
+                }
+            });
+
+            document.getElementById('registerForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                try {
+                    const res = await fetch(`${API_BASE}/auth/register`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            fullName: document.getElementById('regFullName').value,
+                            email: document.getElementById('regEmail').value,
+                            password: document.getElementById('regPassword').value,
+                            role: document.getElementById('regRole').value
+                        })
+                    });
+                    if (!res.ok) throw new Error(await parseApiError(res));
+                    const data = await res.json();
+                    state.token = data.accessToken;
+                    state.user = data;
+                    localStorage.setItem('bv_token', data.accessToken);
+                    localStorage.setItem('bv_user', JSON.stringify(data));
+                    updateAuthUI();
+                    document.getElementById('authModal').classList.add('hidden');
+                    showToast('ثبت‌نام موفق', `حساب کاربری ${data.fullName} ایجاد شد.`, 'success');
+                } catch (err) {
+                    showToast('خطای ثبت‌نام', err.message, 'error');
+                }
+            });
+
+            document.getElementById('createBookForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                try {
+                    const res = await fetch(`${API_BASE}/books`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${state.token}`
+                        },
+                        body: JSON.stringify({
+                            title: document.getElementById('inpTitle').value,
+                            author: document.getElementById('inpAuthor').value,
+                            isbn: document.getElementById('inpIsbn').value,
+                            category: document.getElementById('inpCategory').value,
+                            price: Number(document.getElementById('inpPrice').value),
+                            stockQuantity: Number(document.getElementById('inpStock').value)
+                        })
+                    });
+                    if (!res.ok) throw new Error(await parseApiError(res));
+                    e.target.reset();
+                    await loadBooks();
+                    showToast('کتاب ثبت شد', 'کتاب جدید با موفقیت به فروشگاه اضافه شد.', 'success');
+                } catch (err) {
+                    showToast('خطا در ثبت کتاب', err.message, 'error');
+                }
+            });
+
+            document.getElementById('btnOpenCart').addEventListener('click', () => document.getElementById('cartModal').classList.remove('hidden'));
+            document.getElementById('btnCloseCart').addEventListener('click', () => document.getElementById('cartModal').classList.add('hidden'));
+            document.getElementById('cartBackdrop').addEventListener('click', () => document.getElementById('cartModal').classList.add('hidden'));
+
+            document.getElementById('btnCheckout').addEventListener('click', async () => {
+                if (!state.token || !state.user) {
+                    showToast('ورود به حساب', 'برای ثبت سفارش ابتدا وارد حساب کاربری خود شوید.', 'warning');
+                    document.getElementById('authModal').classList.remove('hidden');
+                    return;
+                }
+                if (state.cart.length === 0) {
+                    showToast('سبد خرید خالی است', 'ابتدا کتابی به سبد خرید اضافه کنید.', 'warning');
+                    return;
+                }
+                try {
+                    const res = await fetch(`${API_BASE}/orders`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${state.token}`
+                        },
+                        body: JSON.stringify({
+                            customerId: state.user.userId,
+                            shippingAddress: document.getElementById('shippingAddressInput').value,
+                            couponCode: document.getElementById('couponInput').value.trim() || null,
+                            items: state.cart
+                        })
+                    });
+                    if (!res.ok) throw new Error(await parseApiError(res));
+                    const order = await res.json();
+                    state.cart = [];
+                    renderCart();
+                    document.getElementById('cartModal').classList.add('hidden');
+                    await loadBooks();
+                    showToast('سفارش ثبت شد', `سفارش شما با مبلغ ${formatPrice(order.totalAmount)} ثبت گردید.`, 'success');
+                } catch (err) {
+                    showToast('خطا در ثبت سفارش', err.message, 'error');
+                }
+            });
+
+            document.body.addEventListener('click', async (e) => {
+                const addBtn = e.target.closest('[data-add-cart]');
+                if (addBtn) {
+                    const bookId = addBtn.getAttribute('data-add-cart');
+                    const existing = state.cart.find(c => c.bookId === bookId);
+                    if (existing) existing.quantity += 1;
+                    else state.cart.push({ bookId, quantity: 1 });
+                    renderCart();
+                    showToast('به سبد اضافه شد', 'کتاب مورد نظر به سبد خرید اضافه شد.', 'success');
+                }
+
+                const remBtn = e.target.closest('[data-remove-cart]');
+                if (remBtn) {
+                    const bookId = remBtn.getAttribute('data-remove-cart');
+                    state.cart = state.cart.filter(c => c.bookId !== bookId);
+                    renderCart();
+                }
+
+                const stockBtn = e.target.closest('[data-stock]');
+                if (stockBtn) {
+                    const bookId = stockBtn.getAttribute('data-stock');
+                    const delta = Number(stockBtn.getAttribute('data-delta'));
+                    try {
+                        const res = await fetch(`${API_BASE}/books/${bookId}/stock`, {
+                            method: 'PATCH',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${state.token}`
+                            },
+                            body: JSON.stringify(delta)
+                        });
+                        if (!res.ok) throw new Error(await parseApiError(res));
+                        await loadBooks();
+                        showToast('موجودی بروزرسانی شد', 'موجودی انبار با موفقیت تغییر یافت.', 'success');
+                    } catch (err) {
+                        showToast('خطا در تغییر موجودی', err.message, 'error');
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
